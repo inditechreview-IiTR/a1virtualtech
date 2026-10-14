@@ -95,7 +95,15 @@ export function MasterTechPanel({
         {error && <p className="text-xs text-destructive">{error}</p>}
       </div>
       <div className="flex flex-wrap gap-2 border-t border-border p-3">
-        {["Give me a full diagnostic", "What should I test next?", "What evidence am I missing?"].map((q) => (
+        {[
+          "Give me a full diagnostic",
+          "What should I test next?",
+          "What evidence am I missing?",
+          "Where am I in the 7-Step funnel?",
+          "Prove it — what measurement settles this?",
+          "Suggest the next pinpoint test",
+          "How do I verify the proof of fix?",
+        ].map((q) => (
           <button
             key={q}
             disabled={loading}
