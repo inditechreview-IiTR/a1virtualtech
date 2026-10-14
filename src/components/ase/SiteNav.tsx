@@ -3,8 +3,9 @@ import { Gauge } from "lucide-react";
 
 const links = [
   { to: "/scenarios", label: "Scenarios" },
-  { to: "/dashboard", label: "Dashboard" },
   { to: "/diy", label: "DIY Garage" },
+  { to: "/dashboard", label: "Dashboard" },
+  { to: "/study", label: "Study Hub" },
 ] as const;
 
 export function SiteNav() {
