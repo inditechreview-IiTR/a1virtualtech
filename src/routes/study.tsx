@@ -11,13 +11,13 @@ import { Workbook } from "@/components/study/Workbook";
 export const Route = createFileRoute("/study")({
   head: () => ({
     meta: [
-      { title: "Study Hub & exam prep | ASE Virtual" },
+      { title: "Study Hub & exam prep | A1 Virtual Tech" },
       {
         name: "description",
         content:
           "ASE-style practice exams with rationales, field diagnostic protocols, a 16-week study roadmap and a printable lab worksheet — built from the shop manuals.",
       },
-      { property: "og:title", content: "Study Hub & exam prep | ASE Virtual" },
+      { property: "og:title", content: "Study Hub & exam prep | A1 Virtual Tech" },
       {
         property: "og:description",
         content: "Practice exams, field protocols, the 16-week roadmap and the diagnostic worksheet — study like a shop foreman.",
