@@ -2,7 +2,7 @@
  *  the Student Workbook Practice Bank, the A1-A9 Integration Manual, and the Master Diagnostic
  *  Logic deck (Proving vs. Guessing, the 7-Step Funnel, Tech A/B logic gate, sign-off thresholds). */
 
-export type ExamArea = "A1" | "A2" | "A3" | "A4" | "A5" | "A6" | "A7" | "A8";
+export type ExamArea = "A1" | "A2" | "A3" | "A4" | "A5" | "A6" | "A7" | "A8" | "A9";
 
 export interface ExamOption {
   id: string;
@@ -176,6 +176,52 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     { id: "D", text: "±25%" },
   ], "C",
     "±10% under load is the sign-off threshold. The job isn't done until the system is re-tested under load and verified against the spec — prove it."),
+  // ---- Final Full Practice Exam (A1–A9 Field Guide) ----
+  q("fg-1", "A1", "A customer complains of oil consumption. What is the most likely cause?", [
+    { id: "A", text: "Worn valve seals or piston rings" }, { id: "B", text: "A faulty fuel injector" },
+    { id: "C", text: "A bad fuel pump" }, { id: "D", text: "Low tire pressure" }], "A",
+    "Oil gets into the combustion chamber past worn rings or valve seals. Golden rule for A1: mechanical integrity first — run a compression / leak-down test before anything else."),
+  q("fg-2", "A2", "You find a burnt smell in automatic transmission fluid. What does this mean?", [
+    { id: "A", text: "The fluid is old and needs changing" }, { id: "B", text: "Internal clutch friction material is likely damaged" },
+    { id: "C", text: "The transmission is overfilled" }, { id: "D", text: "The shift solenoid is stuck" }], "B",
+    "Burnt fluid = clutch failure. Friction material overheats and burns when clutches slip; a fluid change won't fix it."),
+  q("fg-3", "A3", "What causes clutch chatter?", [
+    { id: "A", text: "A warped flywheel or glazed clutch disc" }, { id: "B", text: "A loose shift knob" },
+    { id: "C", text: "A bad radio" }, { id: "D", text: "High gear oil level" }], "A",
+    "Clutch chatter is a mechanical surface issue — the friction surfaces aren't meeting evenly."),
+  q("fg-4", "A4", "What does 'Toe' refer to in alignment?", [
+    { id: "A", text: "The lean of the top of the tires" }, { id: "B", text: "The angle of the steering pivot point" },
+    { id: "C", text: "The distance difference between the front and back of the tires" }, { id: "D", text: "The hardness of the rubber" }], "C",
+    "Toe is the front-vs-rear distance difference between the tires. Camber is lean, caster is pivot angle. Tire wear tells the truth about alignment."),
+  q("fg-5", "A5", "If a brake pedal is 'spongy', what is the first step?", [
+    { id: "A", text: "Replace the brake pads" }, { id: "B", text: "Bleed the brake hydraulic system" },
+    { id: "C", text: "Replace the brake booster" }, { id: "D", text: "Check the tire pressure" }], "B",
+    "Air in the lines = spongy pedal. Air compresses, fluid doesn't — bleed the system."),
+  q("fg-6", "A6", "You have 12 V at the battery but 0 V at the load. What is this?", [
+    { id: "A", text: "A short to ground" }, { id: "B", text: "An open circuit" },
+    { id: "C", text: "High resistance" }, { id: "D", text: "Normal operation" }], "B",
+    "Open = 0 V. Short to ground blows the fuse; high resistance gives reduced voltage (dim lights, slow motors)."),
+  q("fg-7", "A7", "On a hot day, both low- and high-side A/C pressures are very low. Why?", [
+    { id: "A", text: "Overcharged system" }, { id: "B", text: "Low refrigerant level" },
+    { id: "C", text: "Stuck-open blend door" }, { id: "D", text: "Bad condenser fan" }], "B",
+    "Both sides low = low on refrigerant (find the leak). An overcharge or bad condenser fan drives high side UP."),
+  q("fg-8", "A8", "Fuel trim is +25% at idle but 0% at 2500 RPM. Why?", [
+    { id: "A", text: "Bad fuel injectors" }, { id: "B", text: "A vacuum leak" },
+    { id: "C", text: "A bad catalytic converter" }, { id: "D", text: "A bad battery" }], "B",
+    "(+) trim = lean. A vacuum leak is a big share of airflow at idle but disappears into total airflow at higher RPM."),
+  q("fg-9", "A9", "What causes black smoke in a diesel?", [
+    { id: "A", text: "Insufficient air (restriction)" }, { id: "B", text: "Too much oil" },
+    { id: "C", text: "Cold weather" }, { id: "D", text: "Bad DEF fluid" }], "A",
+    "Black smoke = not enough air for the fuel delivered. Check intake restriction, turbo boost, and DPF differential pressure."),
+  // ---- Complete Edition sample set ----
+  q("ce-2", "A6", "A starter clicks but does not crank. A voltage drop test on the positive battery cable shows 2.5 V during cranking. This indicates:", [
+    { id: "A", text: "A good cable" }, { id: "B", text: "A failed battery" },
+    { id: "C", text: "Excessive resistance in the cable" }, { id: "D", text: "A failed starter" }], "C",
+    "Max drop on a cable should be under 0.5 V. 2.5 V means the cable is eating the starter's voltage — the $10 cable, not the $400 starter."),
+  q("ce-3", "A8", "Scan data shows coolant temp at −40°F on a summer afternoon with a warm engine. What is the most likely cause?", [
+    { id: "A", text: "The engine is frozen" }, { id: "B", text: "Thermostat stuck open" },
+    { id: "C", text: "Open ECT sensor or circuit" }, { id: "D", text: "Low coolant" }], "C",
+    "Three-Step Reality Check: trust the data, but recognize impossible data. −40°F is the default reading for an open sensor circuit."),
 ];
 
 export const EXAM_AREAS: { id: ExamArea; name: string }[] = [
@@ -187,6 +233,7 @@ export const EXAM_AREAS: { id: ExamArea; name: string }[] = [
   { id: "A6", name: "Electrical / Electronic" },
   { id: "A7", name: "Heating & Air Conditioning" },
   { id: "A8", name: "Engine Performance" },
+  { id: "A9", name: "Light Vehicle Diesel" },
 ];
 
 /** Best score per area, persisted locally. */

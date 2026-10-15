@@ -6,6 +6,7 @@ import { PracticeExam } from "@/components/study/PracticeExam";
 import { FieldProtocols } from "@/components/study/FieldProtocols";
 import { RoadmapTracker } from "@/components/study/RoadmapTracker";
 import { DiagnosticWorksheet } from "@/components/study/DiagnosticWorksheet";
+import { Workbook } from "@/components/study/Workbook";
 
 export const Route = createFileRoute("/study")({
   head: () => ({
@@ -31,6 +32,7 @@ const TABS = [
   { id: "protocols", label: "Field protocols", icon: ClipboardList },
   { id: "roadmap", label: "16-week roadmap", icon: Map },
   { id: "worksheet", label: "Lab worksheet", icon: FileIcon },
+  { id: "workbook", label: "Student workbook", icon: GraduationCap },
 ] as const;
 
 function FileIcon(props: { className?: string }) {
@@ -80,6 +82,7 @@ function StudyHub() {
           {tab === "protocols" && <FieldProtocols />}
           {tab === "roadmap" && <RoadmapTracker />}
           {tab === "worksheet" && <DiagnosticWorksheet />}
+          {tab === "workbook" && <Workbook />}
         </div>
       </main>
     </div>
