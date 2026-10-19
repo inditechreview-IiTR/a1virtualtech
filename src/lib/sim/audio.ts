@@ -29,7 +29,7 @@ export interface AudioParams {
   cylinders: number;
   running: boolean;
   profileId: string;
-  recordingId?: RecordingId;
+  recordingId?: RecordingId | undefined;
   /** current gear, 1-indexed */
   gear?: number;
   /** true while a shift is in progress — cuts the exhaust and adds the breath */
