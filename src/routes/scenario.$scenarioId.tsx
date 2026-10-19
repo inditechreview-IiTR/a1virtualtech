@@ -33,6 +33,8 @@ export const Route = createFileRoute("/scenario/$scenarioId")({
     const title = `${loaderData.title} | A1 Virtual Tech diagnostic session`;
     return {
       meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
         { title },
         { name: "description", content: loaderData.complaint.slice(0, 155) },
         { property: "og:title", content: title },

@@ -4,7 +4,7 @@ import { Cluster } from "./Cluster";
 import { EngineAudio, cylinderCount } from "@/lib/sim/audio";
 import { computeLiveData, initialState, stepSim, type SimState } from "@/lib/sim/engine";
 import type { Scenario, Vehicle } from "@/lib/sim/types";
-import { FAULT_RECORDINGS, scenarioRecording, type RecordingId, type RecordingStatus } from "@/lib/sim/recordings";
+import { FAULT_RECORDINGS, scenarioRecording, type RecordingStatus } from "@/lib/sim/recordings";
 
 export function TestDrive({
   scenario,

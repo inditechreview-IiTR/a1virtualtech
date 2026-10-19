@@ -16,6 +16,8 @@ import { vehicleById, vehicleName } from "@/lib/sim/vehicles";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "A1 Virtual Tech — Automotive Diagnostic & Skills Studio" },
       {
         name: "description",
