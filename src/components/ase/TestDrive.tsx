@@ -4,6 +4,7 @@ import { Cluster } from "./Cluster";
 import { EngineAudio, cylinderCount } from "@/lib/sim/audio";
 import { computeLiveData, initialState, stepSim, type SimState } from "@/lib/sim/engine";
 import type { Scenario, Vehicle } from "@/lib/sim/types";
+import { FAULT_RECORDINGS, scenarioRecording, type RecordingId, type RecordingStatus } from "@/lib/sim/recordings";
 
 export function TestDrive({
   scenario,
@@ -21,6 +22,11 @@ export function TestDrive({
   const [audioOn, setAudioOn] = useState(false);
   const [perspective, setPerspective] = useState<"cabin" | "exterior">("cabin");
   const [distance, setDistance] = useState(6);
+  const [recordingChoice, setRecordingChoice] = useState("scenario");
+  const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>("idle");
+  const recordingId = recordingChoice === "scenario"
+    ? scenarioRecording(scenario.id)
+    : FAULT_RECORDINGS.find((item) => item.id === recordingChoice)?.id;
   const audio = useRef<EngineAudio | null>(null);
   const data = useMemo(
     () => computeLiveData(state, vehicle, scenario.failure),
@@ -37,7 +43,7 @@ export function TestDrive({
       audio.current = null;
       return;
     }
-    const engine = new EngineAudio();
+    const engine = new EngineAudio(setRecordingStatus);
     engine.start(cylinderCount(vehicle.layout));
     audio.current = engine;
     return () => {
@@ -55,6 +61,7 @@ export function TestDrive({
       cylinders: cylinderCount(vehicle.layout),
       running: state.running,
       profileId: scenario.audioProfile.id,
+      recordingId,
       gear: data.gear,
       shifting: data.shifting,
       slip: data.slip,
@@ -73,6 +80,8 @@ export function TestDrive({
     vehicle.layout,
     perspective,
     distance,
+    audioOn,
+    recordingId,
   ]);
 
   useEffect(() => {
@@ -213,9 +222,24 @@ export function TestDrive({
 
           <p className="mt-4 rounded-sm border border-border bg-panel px-3 py-2 text-xs text-muted-foreground">
             <Gauge className="mr-1.5 inline h-3.5 w-3.5 text-signal" />
-            Audio profile: <strong>{scenario.audioProfile.label}</strong> —{" "}
-            {scenario.audioProfile.description}
+            {recordingId ? <>Recorded fault: <strong>{FAULT_RECORDINGS.find((item) => item.id === recordingId)?.label}</strong></> : <>Audio profile: <strong>{scenario.audioProfile.label}</strong> — {scenario.audioProfile.description}</>}
           </p>
+          <div className="mt-3">
+            <label htmlFor="fault-recording" className="label-tech">Fault recording</label>
+            <select
+              id="fault-recording"
+              value={recordingChoice}
+              onChange={(event) => setRecordingChoice(event.target.value)}
+              className="mt-2 w-full rounded-sm border border-border bg-panel px-3 py-2 text-sm text-foreground"
+            >
+              <option value="scenario">Scenario audio</option>
+              {FAULT_RECORDINGS.map((item) => <option key={item.id} value={item.id}>Reference: {item.label}</option>)}
+            </select>
+            {recordingChoice !== "scenario" && <p className="mt-2 text-xs text-muted-foreground">Reference clip · not this scenario’s diagnosis.</p>}
+            {audioOn && recordingId && <p role="status" className="mt-2 text-xs text-muted-foreground">
+              {recordingStatus === "loading" ? "Loading recording…" : recordingStatus === "error" ? "Recording unavailable. Simulated audio remains active; toggle audio to retry." : recordingStatus === "ready" ? "Recording ready" : ""}
+            </p>}
+          </div>
 
         </div>
       </div>
