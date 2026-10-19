@@ -1,3 +1,4 @@
+/// <reference types="bun" />
 import { describe, expect, test } from "bun:test";
 import { FAULT_RECORDINGS, recordingMix, scenarioRecording } from "./recordings";
 
