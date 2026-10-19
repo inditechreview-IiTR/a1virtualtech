@@ -6,6 +6,8 @@ import { useProfile } from "@/lib/progress";
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Set up your training path | A1 Virtual Tech" },
       {
         name: "description",

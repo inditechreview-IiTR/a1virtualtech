@@ -11,6 +11,8 @@ import { Workbook } from "@/components/study/Workbook";
 export const Route = createFileRoute("/study")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Study Hub & exam prep | A1 Virtual Tech" },
       {
         name: "description",

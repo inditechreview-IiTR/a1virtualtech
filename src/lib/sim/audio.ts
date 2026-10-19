@@ -1,9 +1,8 @@
 /**
  * Engine audio system.
  *
- * IMPORTANT: every sound produced here is SYNTHESIZED with the Web Audio API.
- * These are training placeholders, not recordings of real vehicles. The
- * interface is shaped so real recorded samples can be swapped in later.
+ * Engine/road beds are synthesized with the Web Audio API; selected fault
+ * sounds are user-supplied recordings, mixed through the same spatial filter.
  *
  * The model is built the way an engine actually makes sound:
  *   firing frequency = rpm / 60 * cylinders / 2   (4-stroke)
@@ -20,6 +19,8 @@
  * standing relative to the vehicle.
  */
 
+import { FAULT_RECORDINGS, recordingMix, type RecordingId, type RecordingStatus } from "./recordings";
+
 export interface AudioParams {
   rpm: number;
   throttle: number;
@@ -28,6 +29,7 @@ export interface AudioParams {
   cylinders: number;
   running: boolean;
   profileId: string;
+  recordingId?: RecordingId | undefined;
   /** current gear, 1-indexed */
   gear?: number;
   /** true while a shift is in progress — cuts the exhaust and adds the breath */
@@ -125,6 +127,54 @@ export class EngineAudio {
 
   private cylinders = 4;
   private started = false;
+  private recordingSource: AudioBufferSourceNode | null = null;
+  private recordingGain: GainNode | null = null;
+  private recordingPan: StereoPannerNode | null = null;
+  private recordingId: RecordingId | undefined;
+  private recordingRequest: AbortController | null = null;
+  private latestParams: AudioParams | null = null;
+  private recordingBuffers = new Map<RecordingId, AudioBuffer>();
+
+  constructor(private onRecordingStatus?: (status: RecordingStatus) => void) {}
+
+  private async loadRecording(id: RecordingId | undefined) {
+    this.recordingRequest?.abort();
+    this.recordingSource?.stop();
+    this.recordingSource?.disconnect();
+    this.recordingSource = null;
+    this.recordingGain?.gain.setValueAtTime(0, this.ctx?.currentTime ?? 0);
+    this.recordingId = id;
+    const ctx = this.ctx;
+    const recording = FAULT_RECORDINGS.find((item) => item.id === id);
+    if (!ctx || !id || !recording) {
+      this.onRecordingStatus?.("idle");
+      return;
+    }
+    const request = new AbortController();
+    this.recordingRequest = request;
+    this.onRecordingStatus?.("loading");
+    try {
+      let buffer = this.recordingBuffers.get(id);
+      if (!buffer) {
+        const response = await fetch(recording.url, { signal: request.signal });
+        if (!response.ok) throw new Error("Recording unavailable");
+        buffer = await ctx.decodeAudioData(await response.arrayBuffer());
+      }
+      if (request.signal.aborted || this.ctx !== ctx || this.recordingId !== id) return;
+      this.recordingBuffers.set(id, buffer);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+      if (!this.recordingGain) return;
+      source.connect(this.recordingGain);
+      source.start();
+      this.recordingSource = source;
+      this.onRecordingStatus?.("ready");
+      if (this.latestParams) this.update(this.latestParams);
+    } catch {
+      if (!request.signal.aborted && this.ctx === ctx) this.onRecordingStatus?.("error");
+    }
+  }
 
   start(cylinders = 4) {
     if (this.started) return;
@@ -152,6 +202,12 @@ export class EngineAudio {
     cabinBoom.frequency.value = 140;
     cabinBoom.gain.value = 0;
     master.connect(cabinBoom).connect(spaceFilter).connect(comp).connect(ctx.destination);
+    const recordingGain = ctx.createGain();
+    recordingGain.gain.value = 0;
+    const recordingPan = ctx.createStereoPanner();
+    recordingGain.connect(recordingPan).connect(cabinBoom);
+    this.recordingGain = recordingGain;
+    this.recordingPan = recordingPan;
 
     /* ---------------------------------------------------------- combustion */
     const wave = buildEngineWave(ctx, cylinders);
@@ -394,6 +450,8 @@ export class EngineAudio {
     const ctx = this.ctx;
     if (!ctx || !this.master || !this.fire || !this.fireDetune || !this.halfOrder) return;
     const t = ctx.currentTime;
+    this.latestParams = p;
+    if (p.recordingId !== this.recordingId) void this.loadRecording(p.recordingId);
     const cyl = Math.max(2, p.cylinders || this.cylinders);
     const throttle = p.throttle / 100;
     const load = clamp(p.load / 100, 0, 1);
@@ -432,6 +490,12 @@ export class EngineAudio {
     const distance = clamp(p.distance ?? (cabin ? 1 : 6), 1, 40);
     // inverse-distance law (-6 dB per doubling), 2 m reference
     const attenuation = cabin ? 0.85 : clamp(2 / distance, 0.05, 1);
+    if (p.recordingId) {
+      const mix = recordingMix(p.recordingId, p.running, p.speed, p.rpm, p.throttle);
+      this.recordingGain?.gain.setTargetAtTime(mix.gain * attenuation * (cabin ? 0.7 : 1), t, 0.12);
+      this.recordingSource?.playbackRate.setTargetAtTime(mix.rate, t, 0.15);
+      this.recordingPan?.pan.setTargetAtTime(cabin ? 0.08 : clamp(0.45 / distance, 0, 0.4), t, 0.2);
+    }
     // cabin glass rolls off the top end; outside, air absorption is gentle and
     // only noticeable past ~10 m
     const spaceHz = cabin ? 3200 : clamp(16000 - distance * 260, 5000, 16000);
@@ -468,7 +532,7 @@ export class EngineAudio {
     const level = p.running
       ? (0.07 + throttle * 0.28 + load * 0.06) * shiftDuck * attenuation
       : Math.max(0.0001, rolling * 0.08 * attenuation);
-    this.master.gain.setTargetAtTime(level, t, shifting ? 0.04 : 0.1);
+    this.master.gain.setTargetAtTime(level * (this.recordingSource ? 0.45 : 1), t, shifting ? 0.04 : 0.1);
 
     // the airbox/exhaust brighten as the throttle plate opens
     this.bodyFilter?.frequency.setTargetAtTime(
@@ -497,8 +561,8 @@ export class EngineAudio {
     // intake roar tracks rpm and throttle; the shift itself adds the short
     // "breath" of air as the throttle is momentarily unloaded
     this.intakeFilter?.frequency.setTargetAtTime(900 + (p.rpm / 1000) * 700, t, 0.1);
-    const leanHiss = p.profileId === "lean-rough-idle" ? 0.045 * (1 - throttle) : 0;
-    const vacuumHiss = p.profileId === "vacuum-leak" ? 0.05 * (1 - throttle) : 0;
+    const leanHiss = !this.recordingSource && p.profileId === "lean-rough-idle" ? 0.045 * (1 - throttle) : 0;
+    const vacuumHiss = !this.recordingSource && p.profileId === "vacuum-leak" ? 0.05 * (1 - throttle) : 0;
     const shiftBreath = shifting ? 0.03 * throttle : 0;
     this.intakeGain?.gain.setTargetAtTime(
       p.running
@@ -514,7 +578,7 @@ export class EngineAudio {
     this.roadGain?.gain.setTargetAtTime(spd * (cabin ? 0.1 : 0.05), t, 0.15);
 
     // accessory / bearing tones
-    const bearing = p.profileId === "alt-bearing-whine" ? 0.02 + load * 0.015 : 0;
+    const bearing = !this.recordingSource && p.profileId === "alt-bearing-whine" ? 0.02 + load * 0.015 : 0;
     this.whine?.frequency.setTargetAtTime(clamp((p.rpm / 60) * 3.1 * 2.4, 200, 4200), t, 0.08);
     this.whineGain?.gain.setTargetAtTime(p.running ? bearing : 0, t, 0.12);
 
@@ -547,12 +611,20 @@ export class EngineAudio {
       depth = 0.06;
     }
     if (modHz > 0) this.modOsc?.frequency.setTargetAtTime(modHz, t, 0.08);
-    this.modDepth?.gain.setTargetAtTime(p.running ? depth : 0, t, 0.12);
+    this.modDepth?.gain.setTargetAtTime(p.running && !this.recordingSource ? depth : 0, t, 0.12);
   }
 
   stop() {
     const ctx = this.ctx;
     if (!ctx) return;
+    this.recordingRequest?.abort();
+    this.recordingSource?.stop();
+    this.recordingSource?.disconnect();
+    this.recordingSource = null;
+    this.recordingGain?.gain.setTargetAtTime(0, ctx.currentTime, 0.05);
+    this.recordingId = undefined;
+    this.latestParams = null;
+    this.recordingBuffers.clear();
     try {
       this.master?.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.05);
       [this.fire, this.fireDetune, this.halfOrder, this.whine, this.driveline, this.modOsc, this.pulseOsc, this.tickOsc].forEach(

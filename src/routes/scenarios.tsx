@@ -8,6 +8,8 @@ import { ASE_CATEGORIES } from "@/lib/sim/types";
 export const Route = createFileRoute("/scenarios")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Diagnostic scenario library | A1 Virtual Tech" },
       {
         name: "description",

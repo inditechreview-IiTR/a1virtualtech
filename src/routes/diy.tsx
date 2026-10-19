@@ -6,6 +6,8 @@ import { SiteNav } from "@/components/ase/SiteNav";
 export const Route = createFileRoute("/diy")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "DIY Garage — beginner car maintenance lessons | A1 Virtual Tech" },
       {
         name: "description",
