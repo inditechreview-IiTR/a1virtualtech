@@ -1,71 +1,105 @@
-export type AiResult = { ok: true; text: string } | { ok: false; error: string };
 
-/** Streams a Responses call through Lovable AI Gateway and returns the final text. */
-export async function runResponses(instructions: string, input: unknown): Promise<AiResult> {
-  const key = process.env["LOVABLE_API_KEY"];
-  if (!key) return { ok: false, error: "AI is not configured." };
+export type AiResult =
+  | { ok: true; text: string }
+  | { ok: false; error: string };
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Lovable-API-Key": key,
-      "X-Lovable-AIG-SDK": "fetch",
-    },
-    body: JSON.stringify({
-      model: "openai/gpt-6-astra",
-      instructions,
-      input,
-      stream: true,
-      store: false,
-      reasoning: { effort: "low", summary: "auto" },
-    }),
-  });
+type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
 
-  if (!res.ok || !res.body) {
-    const body = await res.text().catch(() => "");
-    let msg = `AI request failed (${res.status}).`;
-    if (res.status === 402)
-      msg = "AI credits are used up for this workspace. Add credits to continue.";
-    else if (res.status === 429)
-      msg = "Too many requests right now — please wait a moment and try again.";
-    else {
-      try {
-        msg = JSON.parse(body)?.error?.message ?? msg;
-      } catch {
-        // Ignore malformed optional gateway payloads and keep the fallback response.
-      }
-    }
-    return { ok: false, error: msg };
+/** Calls Gemini from the server; never expose the API key to the browser. */
+export async function runResponses(
+  instructions: string,
+  input: unknown,
+): Promise<AiResult> {
+  const key = process.env.GEMINI_API_KEY;
+
+  if (!key) {
+    return {
+      ok: false,
+      error: "Gemini is not configured on the server.",
+    };
   }
 
-  const reader = res.body.getReader();
-  const dec = new TextDecoder();
-  let buf = "";
-  let text = "";
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buf += dec.decode(value, { stream: true });
-    const lines = buf.split("\n");
-    buf = lines.pop() ?? "";
-    for (const line of lines) {
-      if (!line.startsWith("data:")) continue;
-      const payload = line.slice(5).trim();
-      if (!payload || payload === "[DONE]") continue;
-      try {
-        const ev = JSON.parse(payload);
-        if (ev.type === "response.output_text.delta") text += ev.delta;
-        else if (ev.type === "error" || ev.type === "response.failed")
-          return {
-            ok: false,
-            error: ev.error?.message ?? ev.response?.error?.message ?? "AI error.",
-          };
-      } catch {
-        // Ignore malformed optional gateway payloads and keep the fallback response.
-      }
-    }
+  if (
+    !Array.isArray(input) ||
+    !input.every(
+      (m): m is ChatMessage =>
+        typeof m === "object" &&
+        m !== null &&
+        "role" in m &&
+        "content" in m &&
+        ((m as ChatMessage).role === "user" ||
+          (m as ChatMessage).role === "assistant") &&
+        typeof (m as ChatMessage).content === "string",
+    )
+  ) {
+    return { ok: false, error: "Invalid chat input." };
   }
-  if (!text.trim()) return { ok: false, error: "The model returned no answer." };
-  return { ok: true, text };
+
+  const contents = (input as ChatMessage[]).map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+
+  try {
+    const res = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": key,
+        },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: instructions }],
+          },
+          contents,
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 1200,
+          },
+        }),
+      },
+    );
+
+    const body = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      if (res.status === 429) {
+        return {
+          ok: false,
+          error: "Gemini rate limit reached. Please try again shortly.",
+        };
+      }
+
+      console.error("Gemini API request failed:", res.status);
+
+      return {
+        ok: false,
+        error: "Gemini could not answer. Check the server configuration.",
+      };
+    }
+
+    const text = body?.candidates?.[0]?.content?.parts
+      ?.map((part: { text?: string }) => part.text ?? "")
+      .join("")
+      .trim();
+
+    if (!text) {
+      return {
+        ok: false,
+        error: "Gemini returned no answer. Please try again.",
+      };
+    }
+
+    return { ok: true, text };
+  } catch {
+    return {
+      ok: false,
+      error: "Could not connect to Gemini. Check the server connection.",
+    };
+  }
 }
