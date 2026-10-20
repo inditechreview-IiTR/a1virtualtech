@@ -55,7 +55,9 @@ Current live simulation data: ${JSON.stringify(data.liveData)}`;
       else {
         try {
           msg = JSON.parse(body)?.error?.message ?? msg;
-        } catch {}
+        } catch {
+          // Ignore malformed optional gateway payloads and keep the fallback response.
+        }
       }
       return { ok: false as const, error: msg };
     }
@@ -81,7 +83,9 @@ Current live simulation data: ${JSON.stringify(data.liveData)}`;
           else if (ev.type === "response.reasoning_summary_text.delta") reasoning += ev.delta;
           else if (ev.type === "error" || ev.type === "response.failed")
             return { ok: false as const, error: ev.error?.message ?? ev.response?.error?.message ?? "AI error." };
-        } catch {}
+        } catch {
+          // Ignore malformed optional gateway payloads and keep the fallback response.
+        }
       }
     }
     if (!text.trim()) {

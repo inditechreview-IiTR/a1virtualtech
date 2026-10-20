@@ -30,7 +30,9 @@ export async function runResponses(instructions: string, input: unknown): Promis
     else {
       try {
         msg = JSON.parse(body)?.error?.message ?? msg;
-      } catch {}
+      } catch {
+        // Ignore malformed optional gateway payloads and keep the fallback response.
+      }
     }
     return { ok: false, error: msg };
   }
@@ -54,7 +56,9 @@ export async function runResponses(instructions: string, input: unknown): Promis
         if (ev.type === "response.output_text.delta") text += ev.delta;
         else if (ev.type === "error" || ev.type === "response.failed")
           return { ok: false, error: ev.error?.message ?? ev.response?.error?.message ?? "AI error." };
-      } catch {}
+      } catch {
+        // Ignore malformed optional gateway payloads and keep the fallback response.
+      }
     }
   }
   if (!text.trim()) return { ok: false, error: "The model returned no answer." };

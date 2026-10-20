@@ -236,6 +236,16 @@ export function TestDrive({
               {FAULT_RECORDINGS.map((item) => <option key={item.id} value={item.id}>Reference: {item.label}</option>)}
             </select>
             {recordingChoice !== "scenario" && <p className="mt-2 text-xs text-muted-foreground">Reference clip · not this scenario’s diagnosis.</p>}
+            {recordingId && (
+              <audio
+                key={recordingId}
+                controls
+                preload="none"
+                src={FAULT_RECORDINGS.find((item) => item.id === recordingId)?.url}
+                aria-label={`Play ${FAULT_RECORDINGS.find((item) => item.id === recordingId)?.label ?? "fault"} recording sample`}
+                className="mt-3 w-full"
+              />
+            )}
             {audioOn && recordingId && <p role="status" className="mt-2 text-xs text-muted-foreground">
               {recordingStatus === "loading" ? "Loading recording…" : recordingStatus === "error" ? "Recording unavailable. Simulated audio remains active; toggle audio to retry." : recordingStatus === "ready" ? "Recording ready" : ""}
             </p>}
