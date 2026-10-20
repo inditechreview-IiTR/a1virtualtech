@@ -25,8 +25,10 @@ export async function runResponses(instructions: string, input: unknown): Promis
   if (!res.ok || !res.body) {
     const body = await res.text().catch(() => "");
     let msg = `AI request failed (${res.status}).`;
-    if (res.status === 402) msg = "AI credits are used up for this workspace. Add credits to continue.";
-    else if (res.status === 429) msg = "Too many requests right now — please wait a moment and try again.";
+    if (res.status === 402)
+      msg = "AI credits are used up for this workspace. Add credits to continue.";
+    else if (res.status === 429)
+      msg = "Too many requests right now — please wait a moment and try again.";
     else {
       try {
         msg = JSON.parse(body)?.error?.message ?? msg;
@@ -55,7 +57,10 @@ export async function runResponses(instructions: string, input: unknown): Promis
         const ev = JSON.parse(payload);
         if (ev.type === "response.output_text.delta") text += ev.delta;
         else if (ev.type === "error" || ev.type === "response.failed")
-          return { ok: false, error: ev.error?.message ?? ev.response?.error?.message ?? "AI error." };
+          return {
+            ok: false,
+            error: ev.error?.message ?? ev.response?.error?.message ?? "AI error.",
+          };
       } catch {
         // Ignore malformed optional gateway payloads and keep the fallback response.
       }

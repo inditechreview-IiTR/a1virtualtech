@@ -24,9 +24,10 @@ export function TestDrive({
   const [distance, setDistance] = useState(6);
   const [recordingChoice, setRecordingChoice] = useState("scenario");
   const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>("idle");
-  const recordingId = recordingChoice === "scenario"
-    ? scenarioRecording(scenario.id)
-    : FAULT_RECORDINGS.find((item) => item.id === recordingChoice)?.id;
+  const recordingId =
+    recordingChoice === "scenario"
+      ? scenarioRecording(scenario.id)
+      : FAULT_RECORDINGS.find((item) => item.id === recordingChoice)?.id;
   const audio = useRef<EngineAudio | null>(null);
   const data = useMemo(
     () => computeLiveData(state, vehicle, scenario.failure),
@@ -128,7 +129,6 @@ export function TestDrive({
           </div>
         </div>
 
-
         <Road speed={state.speed} running={state.running} />
 
         <div className="border-t border-border p-4">
@@ -193,12 +193,8 @@ export function TestDrive({
                   {state.running ? data.gear : "N"}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {data.shifting
-                    ? "Shifting"
-                    : data.slip > 0.6
-                      ? "Converter slipping"
-                      : "Locked"}{" "}
-                  · {data.drivelineHz} Hz propshaft
+                  {data.shifting ? "Shifting" : data.slip > 0.6 ? "Converter slipping" : "Locked"} ·{" "}
+                  {data.drivelineHz} Hz propshaft
                 </span>
               </div>
             </div>
@@ -222,10 +218,22 @@ export function TestDrive({
 
           <p className="mt-4 rounded-sm border border-border bg-panel px-3 py-2 text-xs text-muted-foreground">
             <Gauge className="mr-1.5 inline h-3.5 w-3.5 text-signal" />
-            {recordingId ? <>Recorded fault: <strong>{FAULT_RECORDINGS.find((item) => item.id === recordingId)?.label}</strong></> : <>Audio profile: <strong>{scenario.audioProfile.label}</strong> — {scenario.audioProfile.description}</>}
+            {recordingId ? (
+              <>
+                Recorded fault:{" "}
+                <strong>{FAULT_RECORDINGS.find((item) => item.id === recordingId)?.label}</strong>
+              </>
+            ) : (
+              <>
+                Audio profile: <strong>{scenario.audioProfile.label}</strong> —{" "}
+                {scenario.audioProfile.description}
+              </>
+            )}
           </p>
           <div className="mt-3">
-            <label htmlFor="fault-recording" className="label-tech">Fault recording</label>
+            <label htmlFor="fault-recording" className="label-tech">
+              Fault recording
+            </label>
             <select
               id="fault-recording"
               value={recordingChoice}
@@ -233,9 +241,17 @@ export function TestDrive({
               className="mt-2 w-full rounded-sm border border-border bg-panel px-3 py-2 text-sm text-foreground"
             >
               <option value="scenario">Scenario audio</option>
-              {FAULT_RECORDINGS.map((item) => <option key={item.id} value={item.id}>Reference: {item.label}</option>)}
+              {FAULT_RECORDINGS.map((item) => (
+                <option key={item.id} value={item.id}>
+                  Reference: {item.label}
+                </option>
+              ))}
             </select>
-            {recordingChoice !== "scenario" && <p className="mt-2 text-xs text-muted-foreground">Reference clip · not this scenario’s diagnosis.</p>}
+            {recordingChoice !== "scenario" && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Reference clip · not this scenario’s diagnosis.
+              </p>
+            )}
             {recordingId && (
               <audio
                 key={recordingId}
@@ -246,11 +262,18 @@ export function TestDrive({
                 className="mt-3 w-full"
               />
             )}
-            {audioOn && recordingId && <p role="status" className="mt-2 text-xs text-muted-foreground">
-              {recordingStatus === "loading" ? "Loading recording…" : recordingStatus === "error" ? "Recording unavailable. Simulated audio remains active; toggle audio to retry." : recordingStatus === "ready" ? "Recording ready" : ""}
-            </p>}
+            {audioOn && recordingId && (
+              <p role="status" className="mt-2 text-xs text-muted-foreground">
+                {recordingStatus === "loading"
+                  ? "Loading recording…"
+                  : recordingStatus === "error"
+                    ? "Recording unavailable. Simulated audio remains active; toggle audio to retry."
+                    : recordingStatus === "ready"
+                      ? "Recording ready"
+                      : ""}
+              </p>
+            )}
           </div>
-
         </div>
       </div>
 
@@ -291,9 +314,7 @@ function Road({ speed, running }: { speed: number; running: boolean }) {
         <div
           className="absolute left-1/2 top-0 h-full w-2 -translate-x-1/2 bg-[repeating-linear-gradient(to_bottom,var(--color-muted-foreground)_0_28px,transparent_28px_70px)] opacity-70"
           style={
-            running && speed > 1
-              ? { animation: `road ${duration}s linear infinite` }
-              : undefined
+            running && speed > 1 ? { animation: `road ${duration}s linear infinite` } : undefined
           }
         />
       </div>

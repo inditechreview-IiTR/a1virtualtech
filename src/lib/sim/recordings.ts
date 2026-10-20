@@ -28,7 +28,13 @@ export function scenarioRecording(scenarioId: string): RecordingId | undefined {
   return undefined;
 }
 
-export function recordingMix(id: RecordingId, running: boolean, speed: number, rpm: number, throttle: number) {
+export function recordingMix(
+  id: RecordingId,
+  running: boolean,
+  speed: number,
+  rpm: number,
+  throttle: number,
+) {
   const recording = FAULT_RECORDINGS.find((item) => item.id === id);
   const wheel = recording?.kind === "wheel";
   const activity = wheel ? Math.min(1, Math.max(0, speed) / 25) : running ? 1 : 0;
@@ -36,7 +42,10 @@ export function recordingMix(id: RecordingId, running: boolean, speed: number, r
   // recordings, not vehicle-specific RPM-calibrated recordings.
   const rate = wheel
     ? Math.min(1.15, Math.max(0.85, speed / 35))
-    : id === "vacuum" ? 1 : Math.min(1.15, Math.max(0.9, rpm / 1400));
-  const gain = activity * (id === "vacuum" ? 0.65 - Math.min(100, Math.max(0, throttle)) * 0.003 : 0.7);
+    : id === "vacuum"
+      ? 1
+      : Math.min(1.15, Math.max(0.9, rpm / 1400));
+  const gain =
+    activity * (id === "vacuum" ? 0.65 - Math.min(100, Math.max(0, throttle)) * 0.003 : 0.7);
   return { gain, rate };
 }

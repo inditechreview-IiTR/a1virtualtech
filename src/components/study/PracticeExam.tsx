@@ -62,8 +62,8 @@ export function PracticeExam() {
       <div>
         <p className="text-sm text-muted-foreground">
           Master practice exam in the ASE style. Every statement is judged as a standalone
-          true/false — the rule: if both technicians are independently correct, the answer is
-          always <span className="text-foreground">both</span>. Rationale follows every answer.
+          true/false — the rule: if both technicians are independently correct, the answer is always{" "}
+          <span className="text-foreground">both</span>. Rationale follows every answer.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <button
@@ -73,7 +73,7 @@ export function PracticeExam() {
             <span className="font-display text-base font-bold uppercase tracking-wide">
               Full comprehensive
             </span>
-            <span className="label-tech mt-1 block">{EXAM_QUESTIONS.length} questions · A1–A8</span>
+            <span className="label-tech mt-1 block">{EXAM_QUESTIONS.length} questions · A1–A9</span>
             <span className="label-tech mt-2 block text-primary">Start mock master exam →</span>
           </button>
           {EXAM_AREAS.map((a) => {
@@ -87,10 +87,14 @@ export function PracticeExam() {
               >
                 <div className="flex items-baseline justify-between">
                   <span className="font-display text-base font-bold tracking-wide">{a.id}</span>
-                  {b !== undefined && <span className="readout text-xs text-primary">best {b}%</span>}
+                  {b !== undefined && (
+                    <span className="readout text-xs text-primary">best {b}%</span>
+                  )}
                 </div>
                 <span className="label-tech mt-1 block">{a.name}</span>
-                <span className="label-tech mt-2 block text-muted-foreground">{count} questions</span>
+                <span className="label-tech mt-2 block text-muted-foreground">
+                  {count} questions
+                </span>
               </button>
             );
           })}
@@ -103,7 +107,7 @@ export function PracticeExam() {
     const pct = Math.round((firstTry / questions.length) * 100);
     return (
       <div className="panel-instrument p-6 text-center">
-        <p className="label-tech">Mock exam complete · {area === "ALL" ? "A1–A8" : area}</p>
+        <p className="label-tech">Mock exam complete · {area === "ALL" ? "A1–A9" : area}</p>
         <p className="readout mt-3 text-5xl font-bold text-primary">{pct}%</p>
         <p className="mt-2 text-sm text-muted-foreground">
           {firstTry} first-try correct · {wrong} missed · {questions.length} questions
@@ -192,7 +196,9 @@ export function PracticeExam() {
                 <span className="label-tech mt-0.5 shrink-0 font-bold">{o.id}</span>
                 <span className="flex-1">{o.text}</span>
                 {revealed && isCorrect && <CheckCircle2 className="h-4 w-4 shrink-0 text-signal" />}
-                {revealed && isPicked && !isCorrect && <XCircle className="h-4 w-4 shrink-0 text-destructive" />}
+                {revealed && isPicked && !isCorrect && (
+                  <XCircle className="h-4 w-4 shrink-0 text-destructive" />
+                )}
               </button>
             );
           })}
@@ -200,7 +206,9 @@ export function PracticeExam() {
 
         {picked !== null && (
           <div className="mt-4 rounded-sm border border-border bg-background p-4">
-            <p className="label-tech text-primary">{correct ? "Correct" : "Not proven — read the proof"}</p>
+            <p className="label-tech text-primary">
+              {correct ? "Correct" : "Not proven — read the proof"}
+            </p>
             <p className="mt-1.5 text-sm text-muted-foreground">{q.rationale}</p>
           </div>
         )}

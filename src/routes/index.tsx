@@ -24,7 +24,10 @@ export const Route = createFileRoute("/")({
         content:
           "An AI-era virtual automotive laboratory: hear the vehicle, drive it, scan it, measure it, and prove the root cause before you touch a wrench.",
       },
-      { property: "og:title", content: "A1 Virtual Tech — Master the diagnosis before you touch the car" },
+      {
+        property: "og:title",
+        content: "A1 Virtual Tech — Master the diagnosis before you touch the car",
+      },
       {
         property: "og:description",
         content:
@@ -36,11 +39,31 @@ export const Route = createFileRoute("/")({
 });
 
 const flow = [
-  { icon: ClipboardList, title: "Customer complaint", body: "Interview a virtual customer who describes symptoms — never the diagnosis." },
-  { icon: Gauge, title: "Virtual test drive", body: "Drive the vehicle, watch the cluster, feel the fault appear under load." },
-  { icon: Activity, title: "Scan tool", body: "Read codes, freeze frame and live data that move with the simulation." },
-  { icon: Cable, title: "Measure it", body: "Place multimeter probes on real test points and interpret voltage drop." },
-  { icon: Wrench, title: "Prove the cause", body: "Choose cause, confirmation test and repair — guessing scores lower." },
+  {
+    icon: ClipboardList,
+    title: "Customer complaint",
+    body: "Interview a virtual customer who describes symptoms — never the diagnosis.",
+  },
+  {
+    icon: Gauge,
+    title: "Virtual test drive",
+    body: "Drive the vehicle, watch the cluster, feel the fault appear under load.",
+  },
+  {
+    icon: Activity,
+    title: "Scan tool",
+    body: "Read codes, freeze frame and live data that move with the simulation.",
+  },
+  {
+    icon: Cable,
+    title: "Measure it",
+    body: "Place multimeter probes on real test points and interpret voltage drop.",
+  },
+  {
+    icon: Wrench,
+    title: "Prove the cause",
+    body: "Choose cause, confirmation test and repair — guessing scores lower.",
+  },
 ];
 
 function Landing() {
@@ -51,7 +74,9 @@ function Landing() {
       <section className="hero-surface relative overflow-hidden border-b border-border">
         <div className="tech-grid pointer-events-none absolute inset-0" aria-hidden />
         <div className="relative mx-auto max-w-7xl px-4 py-20 lg:py-28">
-          <p className="label-tech text-primary">The AI-powered virtual automotive diagnostic laboratory</p>
+          <p className="label-tech text-primary">
+            The AI-powered virtual automotive diagnostic laboratory
+          </p>
           <h1 className="mt-5 max-w-4xl font-display text-4xl font-bold uppercase leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
             Master the diagnosis before you touch the car.
           </h1>
@@ -78,7 +103,7 @@ function Landing() {
             {[
               { k: "Simulated systems", v: "16" },
               { k: "Scoring dimensions", v: "6" },
-              { k: "ASE-aligned areas", v: "A1–A8 + L1" },
+              { k: "ASE-aligned areas", v: "A1–A9" },
             ].map((s) => (
               <div key={s.k} className="panel-instrument px-5 py-4">
                 <div className="readout text-2xl font-semibold text-primary">{s.v}</div>
@@ -97,8 +122,8 @@ function Landing() {
             </h2>
             <p className="mt-2 text-muted-foreground">
               No account, no setup. Work one real fault from complaint to root cause in about a
-              minute — then take the same car into the full simulator with the scan tool,
-              multimeter and test drive.
+              minute — then take the same car into the full simulator with the scan tool, multimeter
+              and test drive.
             </p>
           </div>
           <QuickDemo />
@@ -154,8 +179,12 @@ function Landing() {
                   params={{ scenarioId: s.id }}
                   className="panel-instrument group p-5 transition-colors hover:border-primary/60"
                 >
-                  <span className="label-tech text-signal">{s.category} · {s.difficulty}</span>
-                  <h3 className="mt-3 font-display text-lg font-semibold leading-tight">{s.title}</h3>
+                  <span className="label-tech text-signal">
+                    {s.category} · {s.difficulty}
+                  </span>
+                  <h3 className="mt-3 font-display text-lg font-semibold leading-tight">
+                    {s.title}
+                  </h3>
                   <p className="mt-2 text-xs text-muted-foreground">{v ? vehicleName(v) : ""}</p>
                   <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{s.complaint}</p>
                 </Link>
@@ -170,12 +199,13 @@ function Landing() {
           <div className="panel-instrument p-6">
             <AudioLines className="h-5 w-5 text-primary" />
             <h3 className="mt-4 font-display text-lg font-semibold uppercase tracking-wide">
-              Synthesized engine audio
+              Recorded fault sounds + engine audio
             </h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Sound responds to RPM, throttle, load and the injected failure. All audio in this MVP
-              is generated in-browser and clearly labeled as synthetic — it is not a recording of a
-              real vehicle.
+              Hear the bundled reference recordings for a CV joint, alternator, power steering pump,
+              rod knock, wheel bearing, intake vacuum leak and misfire. The engine and road bed are
+              synthesized in-browser; reference clips are recordings and may not match every
+              vehicle.
             </p>
           </div>
           <div className="panel-instrument p-6">
@@ -184,17 +214,17 @@ function Landing() {
               Simulation, not a repair manual
             </h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              A1 Virtual Tech is independent ASE-aligned preparation and training software. It is not
-              affiliated with or endorsed by ASE, and it does not issue certification. Always follow
-              manufacturer service information and safety procedures on a real vehicle.
+              A1 Virtual Tech is independent ASE-aligned preparation and training software. It is
+              not affiliated with or endorsed by ASE, and it does not issue certification. Always
+              follow manufacturer service information and safety procedures on a real vehicle.
             </p>
           </div>
         </div>
       </section>
 
       <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
-        A1 Virtual Tech · Educational simulation software · ASE-aligned preparation, not official ASE
-        certification
+        A1 Virtual Tech · Educational simulation software · ASE-aligned preparation, not official
+        ASE certification
       </footer>
     </div>
   );
