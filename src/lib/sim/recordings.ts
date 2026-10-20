@@ -1,10 +1,12 @@
-import cv from "@/assets/audio/bad_CV_joint.mp3.asset.json";
-import alternator from "@/assets/audio/bad_alternator.mp3.asset.json";
-import steering from "@/assets/audio/bad_power_steering_pump.mp3.asset.json";
-import rod from "@/assets/audio/bad_rod_knock.mp3.asset.json";
-import bearing from "@/assets/audio/bad_wheel_bearing.mp3.asset.json";
-import vacuum from "@/assets/audio/intake_vacuum_leak.mp3.asset.json";
-import misfire from "@/assets/audio/misfire.mp3.asset.json";
+// These files are bundled in public/audio so playback works independently of the
+// original Lovable project and its private asset proxy.
+const cv = { url: "/audio/bad_CV_joint.mp3" };
+const alternator = { url: "/audio/bad_alternator.mp3" };
+const steering = { url: "/audio/bad_power_steering_pump.mp3" };
+const rod = { url: "/audio/bad_rod_knock.mp3" };
+const bearing = { url: "/audio/bad_wheel_bearing.mp3" };
+const vacuum = { url: "/audio/intake_vacuum_leak.mp3" };
+const misfire = { url: "/audio/misfire.mp3" };
 
 export const FAULT_RECORDINGS = [
   { id: "cv", label: "CV joint clicking", url: cv.url, kind: "wheel" },
