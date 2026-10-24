@@ -9,6 +9,7 @@ describe("uploaded fault recordings", () => {
   test("vacuum and misfire recordings match the relevant scenarios", () => {
     assert.equal(scenarioRecording("accord-vacuum-leak"), "vacuum");
     assert.equal(scenarioRecording("f150-misfire-coil"), "misfire");
+    assert.equal(scenarioRecording("head-gasket-seep"), undefined);
   });
   test("electrical ground faults are not presented as alternator bearing faults", () => {
     assert.equal(scenarioRecording("high-resistance-ground"), undefined);

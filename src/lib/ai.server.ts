@@ -13,7 +13,7 @@ export async function runResponses(
   instructions: string,
   input: unknown,
 ): Promise<AiResult> {
-  const key = process.env.GEMINI_API_KEY;
+  const key = process.env["GEMINI_API_KEY"];
 
   if (!key) {
     return {

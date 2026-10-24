@@ -37,7 +37,7 @@ export function ScanTool({
         <span className="font-display text-sm font-bold uppercase tracking-[0.18em]">
           OBD-II Scan Tool
         </span>
-        <span className="label-tech text-ok">Link established</span>
+        <span className="label-tech text-caution">Simulated ECU</span>
       </div>
 
       <div className="flex border-b border-border">
@@ -55,6 +55,9 @@ export function ScanTool({
       </div>
 
       <div className="p-4">
+        <p className="mb-4 rounded-sm border border-border bg-panel px-3 py-2 text-xs text-muted-foreground">
+          Simulated OBD-II data for this training scenario. No physical scan tool or vehicle is connected.
+        </p>
         {tab === "codes" && (
           <div className="space-y-3">
             {cleared ? (

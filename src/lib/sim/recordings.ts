@@ -24,7 +24,7 @@ export type RecordingStatus = "idle" | "loading" | "ready" | "error";
 // Match the actual diagnosis, not a shared legacy synthetic audio profile.
 export function scenarioRecording(scenarioId: string): RecordingId | undefined {
   if (scenarioId === "accord-vacuum-leak") return "vacuum";
-  if (scenarioId === "f150-misfire-coil" || scenarioId === "head-gasket-seep") return "misfire";
+  if (scenarioId === "f150-misfire-coil") return "misfire";
   return undefined;
 }
 
