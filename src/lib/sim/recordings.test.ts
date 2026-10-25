@@ -1,6 +1,6 @@
 import { describe, test } from "node:test";
 import { strict as assert } from "node:assert";
-import { FAULT_RECORDINGS, recordingMix, scenarioRecording } from "./recordings";
+import { FAULT_RECORDINGS, recordingMix, scenarioRecording } from "./recordings.ts";
 
 describe("uploaded fault recordings", () => {
   test("all seven recordings are available", () => {
