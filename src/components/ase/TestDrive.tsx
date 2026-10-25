@@ -35,10 +35,6 @@ export function TestDrive({
   );
 
   useEffect(() => {
-    onUse();
-  }, [onUse]);
-
-  useEffect(() => {
     if (!audioOn) {
       audio.current?.stop();
       audio.current = null;
@@ -120,7 +116,10 @@ export function TestDrive({
               ))}
             </div>
             <button
-              onClick={() => setAudioOn((a) => !a)}
+              onClick={() => {
+                setAudioOn((a) => !a);
+                onUse();
+              }}
               className="flex items-center gap-1.5 rounded-sm border border-border px-2.5 py-1 text-xs text-muted-foreground hover:bg-accent"
             >
               {audioOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
@@ -134,9 +133,10 @@ export function TestDrive({
         <div className="border-t border-border p-4">
           <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() =>
-                setState((s) => ({ ...s, running: !s.running, throttle: 0, elapsed: s.elapsed }))
-              }
+              onClick={() => {
+                setState((s) => ({ ...s, running: !s.running, throttle: 0, elapsed: s.elapsed }));
+                onUse();
+              }}
               className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2 font-display text-xs font-bold uppercase tracking-[0.14em] text-primary-foreground"
             >
               {state.running ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
@@ -162,17 +162,26 @@ export function TestDrive({
                 max={100}
                 value={state.throttle}
                 disabled={!state.running}
-                onChange={(e) => setState((s) => ({ ...s, throttle: Number(e.target.value) }))}
+                onChange={(e) => {
+                  setState((s) => ({ ...s, throttle: Number(e.target.value) }));
+                  onUse();
+                }}
                 className="mt-2 w-full accent-[var(--primary)]"
               />
             </div>
             <div>
               <span className="label-tech">Brake</span>
               <button
-                onMouseDown={() => setState((s) => ({ ...s, brake: true, throttle: 0 }))}
+                onMouseDown={() => {
+                  setState((s) => ({ ...s, brake: true, throttle: 0 }));
+                  onUse();
+                }}
                 onMouseUp={() => setState((s) => ({ ...s, brake: false }))}
                 onMouseLeave={() => setState((s) => ({ ...s, brake: false }))}
-                onTouchStart={() => setState((s) => ({ ...s, brake: true, throttle: 0 }))}
+                onTouchStart={() => {
+                  setState((s) => ({ ...s, brake: true, throttle: 0 }));
+                  onUse();
+                }}
                 onTouchEnd={() => setState((s) => ({ ...s, brake: false }))}
                 className={`mt-2 w-full rounded-sm border px-4 py-2 font-display text-xs font-bold uppercase tracking-[0.14em] ${
                   state.brake

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Scenario } from "@/lib/sim/types";
 
 export function CustomerChat({
@@ -10,9 +10,6 @@ export function CustomerChat({
 }) {
   const [asked, setAsked] = useState<number[]>([]);
 
-  useEffect(() => {
-    onUse();
-  }, [onUse]);
 
   return (
     <div className="panel-instrument overflow-hidden">
@@ -45,7 +42,10 @@ export function CustomerChat({
               asked.includes(i) ? null : (
                 <button
                   key={q.q}
-                  onClick={() => setAsked((a) => [...a, i])}
+                  onClick={() => {
+                    setAsked((a) => [...a, i]);
+                    onUse();
+                  }}
                   className="rounded-sm border border-border bg-panel px-3 py-1.5 text-xs transition-colors hover:bg-accent"
                 >
                   {q.q}

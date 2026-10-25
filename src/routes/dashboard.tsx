@@ -48,8 +48,8 @@ function Dashboard() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label="Overall automotive skill" value={s.overall} suffix="/100" primary />
           <Stat label="Diagnostic accuracy" value={s.accuracy} suffix="%" />
-          <Stat label="First-time correct rate" value={s.firstTime} suffix="%" />
-          <Stat label="Safety score" value={s.safety} suffix="%" />
+          <Stat label="Clean-session rate" value={s.firstTime} suffix="%" />
+          <Stat label="Inspection discipline" value={s.inspection} suffix="%" />
         </div>
 
         <section className="mt-10">

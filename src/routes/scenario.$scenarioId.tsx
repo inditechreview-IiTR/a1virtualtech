@@ -111,6 +111,14 @@ function Session() {
       ...(scenario.hideScanTool ? ["scan"] : []),
       ...(scenario.hideMultimeter ? ["meter"] : []),
     ];
+    const applicableTools = [
+      "interview",
+      "testdrive",
+      "inspect",
+      ...(!scenario.hideScanTool ? ["scan"] : []),
+      ...(!scenario.hideMultimeter ? ["meter"] : []),
+      ...(scenario.tools ?? []).map((tool) => `tool:${tool.id}`),
+    ];
     const scored = scoreAttempt({
       firstTryCorrect: firstTry,
       totalSteps: scenario.steps.length,
@@ -118,6 +126,7 @@ function Session() {
       toolsUsed: scoringTools,
       seconds,
       estimatedMinutes: scenario.estimatedMinutes,
+      applicableTools,
     });
 
     setResult(scored);
@@ -131,6 +140,7 @@ function Session() {
       wrongAnswers: wrong,
       toolsUsed,
       seconds,
+      estimatedMinutes: scenario.estimatedMinutes,
       score: scored.total,
     });
   };

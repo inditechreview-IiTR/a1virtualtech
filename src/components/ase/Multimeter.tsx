@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { TestPoint } from "@/lib/sim/types";
 
 type Mode = "DCV" | "ACV" | "OHM" | "CONT";
@@ -15,9 +15,6 @@ export function Multimeter({
   const [mode, setMode] = useState<Mode>("DCV");
   const [selected, setSelected] = useState<string | null>(null);
 
-  useEffect(() => {
-    onUse();
-  }, [onUse]);
 
   const tp = testPoints.find((t) => t.id === selected);
 
@@ -58,7 +55,10 @@ export function Multimeter({
           {(["DCV", "ACV", "OHM", "CONT"] as Mode[]).map((m) => (
             <button
               key={m}
-              onClick={() => setMode(m)}
+              onClick={() => {
+                setMode(m);
+                onUse();
+              }}
               className={`rounded-sm border px-2 py-2 font-display text-xs font-semibold uppercase tracking-wider transition-colors ${
                 mode === m
                   ? "border-primary bg-primary/15 text-primary"
@@ -76,7 +76,10 @@ export function Multimeter({
             {testPoints.map((t) => (
               <button
                 key={t.id}
-                onClick={() => setSelected(t.id)}
+                onClick={() => {
+                  setSelected(t.id);
+                  onUse();
+                }}
                 className={`w-full rounded-sm border px-3 py-2 text-left text-sm transition-colors ${
                   selected === t.id
                     ? "border-primary bg-accent"

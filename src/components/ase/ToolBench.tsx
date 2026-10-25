@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Activity,
   AlertTriangle,
@@ -21,14 +21,15 @@ const ICONS = {
 } as const;
 
 export function ToolBench({ tool, onUse }: { tool: ToolPanel; onUse: () => void }) {
-  useEffect(() => {
-    onUse();
-  }, [onUse]);
-
   const Icon = ICONS[tool.kind];
 
   return (
-    <div className="panel-instrument overflow-hidden">
+    <div
+      className="panel-instrument overflow-hidden"
+      onClickCapture={(event) => {
+        if ((event.target as HTMLElement).closest("button")) onUse();
+      }}
+    >
       <div className="flex items-center gap-3 border-b border-border bg-panel px-4 py-3">
         <Icon className="h-4 w-4 text-primary" />
         <div>

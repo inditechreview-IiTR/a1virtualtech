@@ -20,9 +20,6 @@ export function ScanTool({
   const [history, setHistory] = useState<{ t: number; stft: number; ltft: number; rpm: number }[]>([]);
   const tick = useRef(0);
 
-  useEffect(() => {
-    onUse();
-  }, [onUse]);
 
   useEffect(() => {
     tick.current += 1;
@@ -44,7 +41,10 @@ export function ScanTool({
         {(["codes", "freeze", "live"] as const).map((t) => (
           <button
             key={t}
-            onClick={() => setTab(t)}
+            onClick={() => {
+              setTab(t);
+              onUse();
+            }}
             className={`flex-1 px-3 py-2.5 font-display text-xs font-semibold uppercase tracking-[0.14em] transition-colors ${
               tab === t ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-accent"
             }`}
@@ -93,6 +93,7 @@ export function ScanTool({
                         onClick={() => {
                           setCleared(true);
                           setConfirming(false);
+                          onUse();
                         }}
                         className="rounded-sm bg-destructive px-3 py-1.5 text-xs font-semibold text-destructive-foreground"
                       >

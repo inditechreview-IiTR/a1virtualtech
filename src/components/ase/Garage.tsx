@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CheckCircle2, AlertTriangle } from "lucide-react";
 import type { InspectionPoint } from "@/lib/sim/types";
 
@@ -11,9 +11,6 @@ export function Garage({
 }) {
   const [open, setOpen] = useState<string | null>(points[0]?.id ?? null);
 
-  useEffect(() => {
-    onUse();
-  }, [onUse]);
 
   const active = points.find((p) => p.id === open);
 
@@ -32,7 +29,10 @@ export function Garage({
             {points.map((p) => (
               <button
                 key={p.id}
-                onClick={() => setOpen(p.id)}
+                onClick={() => {
+                  setOpen(p.id);
+                  onUse();
+                }}
                 className={`flex items-center justify-between rounded-sm border px-3 py-2 text-left text-sm transition-colors ${
                   open === p.id
                     ? "border-primary bg-accent"
